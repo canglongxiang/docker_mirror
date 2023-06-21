@@ -1,8 +1,6 @@
 name: Publish Docker image
 
 on: [push]
-#  release:
-#    types: [published]
 
 jobs:
   push_to_registry:
@@ -30,5 +28,4 @@ jobs:
           context: .
           file: ./openjdk/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: 17.0.2-jdk
