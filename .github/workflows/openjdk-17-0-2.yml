@@ -29,3 +29,4 @@ jobs:
           file: ./openjdk/Dockerfile
           push: true
           tags: 17.0.2-jdk
+          labels: 17.0.2-jdk
