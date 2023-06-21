@@ -1,2 +1,2 @@
-FROM openjdk:17.0.2-jdk
+FROM openjdk:11.0.16-jdk
 MAINTAINER lixj@k-group.com.cn
