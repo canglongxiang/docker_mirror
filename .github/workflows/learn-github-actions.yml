@@ -1,13 +1,34 @@
-name: learn-github-actions
-run-name: ${{ github.actor }} is learning GitHub Actions
-on: [push]
+name: Publish Docker image
+
+on:
+  release:
+    types: [published]
+
 jobs:
-  check-bats-version:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Step1 - Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Step2 - Log in to Docker Hub
+        uses: docker/login-action@6f55806b08cd44e6fae0a42837fcd203a505a712
         with:
-          node-version: '14'
-      - run: npm install -g bats
-      - run: bats -v
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Step3 - Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@6f55806b08cd44e6fae0a42837fcd203a505a712
+        with:
+          images: canglongxiang/openjdk
+
+      - name: Step4 - Build and push Docker image
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: .
+          file: ./openjdk/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
