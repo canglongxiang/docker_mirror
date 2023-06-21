@@ -2,6 +2,7 @@ name: Publish Docker image (Aliyun)
 
 on: [push]
 
+# https://docs.docker.com/build/ci/github-actions/copy-image-registries/
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
@@ -11,14 +12,22 @@ jobs:
         # https://github.com/marketplace/actions/checkout
         uses: actions/checkout@v3
 
-      - name: Step2 - Log in to Docker Hub
+      - name: Step2 - Set up QEMU
+        # https://github.com/marketplace/actions/docker-setup-qemu
+        uses: docker/setup-qemu-action@v2
+
+      - name: Step3 - Set up Docker Buildx
+        # https://github.com/marketplace/actions/docker-setup-buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Step4 - Log in to Docker Hub
         # https://github.com/marketplace/actions/docker-login
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Step3 - Extract metadata (tags, labels) for Docker
+      - name: Step5 - Extract metadata (tags, labels) for Docker
         id: meta
         # https://github.com/marketplace/actions/docker-metadata-action
         uses: docker/metadata-action@v4
@@ -26,7 +35,7 @@ jobs:
           images: kc-docker-mirror/openjdk
           tags: 17.0.2-jdk
 
-      - name: Step4 - Log in to Aliyun registry
+      - name: Step6 - Log in to Aliyun registry
         # https://github.com/marketplace/actions/docker-login
         uses: docker/login-action@v2
         with:
@@ -34,12 +43,19 @@ jobs:
           username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
           password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
 
-      - name: Step5 - Build and push Docker image To Aliyun
+      - name: Step7 - Build image
         # https://github.com/marketplace/actions/build-and-push-docker-images
         uses: docker/build-push-action@v4
         with:
+          registry: registry.cn-chengdu.aliyuncs.com
           context: .
           file: ./openjdk/Dockerfile
-          push: true
+          push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Step8 - Push image to Aliyun
+        run: |
+          docker buildx imagetools create \
+            --tag registry.cn-chengdu.aliyuncs.com/kc-docker-mirror/openjdk:${{ steps.meta.outputs.tags }} \
+            kc-docker-mirror/openjdk:${{ steps.meta.outputs.tags }}
