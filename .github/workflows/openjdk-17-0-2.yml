@@ -8,25 +8,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Step1 - Check out the repo
+        # https://github.com/marketplace/actions/checkout
         uses: actions/checkout@v3
 
       - name: Step2 - Log in to Docker Hub
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        # https://github.com/marketplace/actions/docker-login
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Step3 - Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        # https://github.com/marketplace/actions/docker-metadata-action
+        uses: docker/metadata-action@v4
         with:
           images: canglongxiang/openjdk
+          tags: 17.0.2-jdk
 
       - name: Step4 - Build and push Docker image
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        # https://github.com/marketplace/actions/build-and-push-docker-images
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./openjdk/Dockerfile
           push: true
-          tags: 17.0.2-jdk
-          labels: 17.0.2-jdk
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
