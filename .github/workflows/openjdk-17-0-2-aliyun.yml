@@ -1,6 +1,6 @@
 name: Publish Docker image (Aliyun)
 
-on: [push]
+on: [ push ]
 
 # https://docs.docker.com/build/ci/github-actions/copy-image-registries/
 jobs:
@@ -54,8 +54,9 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      # {{ steps.meta.outputs.tags }}的值相当于是：kc-docker-mirror/openjdk:17.0.2-jdk
       - name: Step8 - Push image to Aliyun
         run: |
           docker buildx imagetools create \
-            --tag registry.cn-chengdu.aliyuncs.com/kc-docker-mirror/openjdk:${{ steps.meta.outputs.tags }} \
-            kc-docker-mirror/openjdk:${{ steps.meta.outputs.tags }}
+            --tag registry.cn-chengdu.aliyuncs.com/${{ steps.meta.outputs.tags }} \
+            ${{ steps.meta.outputs.tags }}
