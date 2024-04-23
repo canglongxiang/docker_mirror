@@ -25,4 +25,4 @@ jobs:
           repository_name: graalvm-jdk-community
           user_name: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
           password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
-          image_version: 17
+          image_version: 17.0.9
