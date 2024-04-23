@@ -1,0 +1,28 @@
+name: Publish Docker image (Aliyun)
+
+on: [ push ]
+
+# https://docs.docker.com/build/ci/github-actions/copy-image-registries/
+jobs:
+  push_to_registry:
+    name: Push Docker image to Aliyun registry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step1 - Check out the repo
+        # https://github.com/marketplace/actions/checkout
+        uses: actions/checkout@v3
+
+      - name: Build Docker Image
+        id: buildAndPushImage
+        # https://github.com/marketplace/actions/docker-images-build-and-push
+        uses: risfeng/docker-image-build-push-action@v1.0
+        with:
+          registry_url: registry.cn-chengdu.aliyuncs.com
+          namespaces: kc-docker-mirror
+          # 仓库名称，就是“镜像”的名称：
+          #     openjdk
+          #     graalvm-jdk-community
+          repository_name: graalvm-jdk-community
+          user_name: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
+          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+          image_version: 17
